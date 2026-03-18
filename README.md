@@ -85,7 +85,7 @@ py .\app.py
     "status": "planned",
     "subtasks": [
       {
-        "title": "КУпить масло для авто",
+        "title": "Купить гвозди 100",
         "quadrant": 1,
         "status": "in_progress"
       }

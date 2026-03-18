@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Задачи{% endblock %}
+
+{% block content %}
+  <div class="pagehead">
+    <h1>Задачи</h1>
+  </div>
+
+  <form class="filters" method="get" action="{{ url_for('index') }}">
+    <div class="filters__row">
+      <input
+        class="filters__search"
+        type="search"
+        name="q"
+        placeholder="Поиск по задачам и подзадачам…"
+        value="{{ search_query or '' }}"
+      />
+      <div class="filters__quadrants">
+        {% set qf = quadrant_filter %}
+        <button type="submit" name="quadrant" value="" class="pill{% if not qf %} pill--active{% endif %}">Все</button>
+        <button type="submit" name="quadrant" value="1" class="pill{% if qf == '1' %} pill--active{% endif %}">Q1</button>
+        <button type="submit" name="quadrant" value="2" class="pill{% if qf == '2' %} pill--active{% endif %}">Q2</button>
+        <button type="submit" name="quadrant" value="3" class="pill{% if qf == '3' %} pill--active{% endif %}">Q3</button>
+        <button type="submit" name="quadrant" value="4" class="pill{% if qf == '4' %} pill--active{% endif %}">Q4</button>
+      </div>
+      <a class="btn" href="{{ url_for('export_json') }}">Экспорт JSON</a>
+    </div>
+  </form>
+
+  {% if tasks|length == 0 %}
+    <div class="empty">
+      Пока нет задач. Создайте первую.
+    </div>
+  {% else %}
+    <div class="cardlist">
+      {% for task in tasks %}
+        <a class="card" href="{{ url_for('task_view', task_id=task.id) }}">
+          <div class="card__title">{{ task.title }}</div>
+          <div class="card__meta">
+            Подзадач: {{ task.subtasks|length }}
+            · Статус:
+            {% if task.status == 'planned' %}Запланировано{% elif task.status == 'in_progress' %}В работе{% elif task.status == 'done' %}Сделано{% elif task.status == 'blocked' %}Заблокировано{% else %}—{% endif %}
+            · {% if task.quadrant == 1 %}Q1{% elif task.quadrant == 2 %}Q2{% elif task.quadrant == 3 %}Q3{% elif task.quadrant == 4 %}Q4{% else %}?{% endif %}
+            {% if task.due_date %}
+              · Срок: {{ task.due_date.isoformat() }}
+            {% endif %}
+            · Создано: {{ task.created_at.strftime("%Y-%m-%d %H:%M") }}
+          </div>
+          {% if task.description %}
+            <div class="card__desc">{{ task.description }}</div>
+          {% endif %}
+        </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block import_block %}
+  <div id="import-modal" class="modal hidden">
+    <div class="modal__backdrop" onclick="closeImportModal()"></div>
+    <div class="modal__dialog">
+      <div class="modal__header">
+        <h2>Импорт задач из JSON</h2>
+      </div>
+      <form class="form" method="post" action="{{ url_for('import_json') }}">
+        <label class="field">
+          <div class="field__label">Вставьте JSON, экспортированный из этого приложения</div>
+          <textarea name="data" rows="8" placeholder='[ { "title": "Пример", "quadrant": 2, "subtasks": [] } ]'></textarea>
+        </label>
+        <div class="row">
+          <button class="btn btn--danger" type="submit" onclick="return confirm('Текущие задачи будут перезаписаны. Продолжить?');">
+            Импортировать (перезаписать всё)
+          </button>
+          <button class="btn btn--ghost" type="button" onclick="closeImportModal()">Отмена</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}{{ task.title }}{% endblock %}
+
+{% block content %}
+  <section class="graph">
+    <div class="graph__row">
+      <button class="btn btn--primary graph__add-btn" type="button" onclick="openSubtaskModal()">
+        + Подзадача
+      </button>
+      <div class="graph__node graph__node--main">
+        <div class="graph__title">{{ task.title }}</div>
+        {% if task.description %}
+          <div class="graph__desc prewrap">{{ task.description }}</div>
+        {% endif %}
+        <div class="graph__meta muted small">
+          Статус:
+          {% if task.status == 'planned' %}Запланировано{% elif task.status == 'in_progress' %}В работе{% elif task.status == 'done' %}Сделано{% elif task.status == 'blocked' %}Заблокировано{% else %}—{% endif %}
+          · Квадрант:
+          {% if task.quadrant == 1 %}Q1 — срочно/важно{% elif task.quadrant == 2 %}Q2 — не срочно, но важно{% elif task.quadrant == 3 %}Q3 — срочно, но не важно{% elif task.quadrant == 4 %}Q4 — не срочно и не важно{% else %}—{% endif %}
+          {% if task.due_date %}
+            · Срок: {{ task.due_date.isoformat() }}
+          {% endif %}
+          · Создано: {{ task.created_at.strftime("%Y-%m-%d %H:%M") }}
+        </div>
+        <div class="graph__actions">
+          <a class="btn" href="{{ url_for('task_edit', task_id=task.id) }}">Редактировать</a>
+          <form method="post" action="{{ url_for('task_delete', task_id=task.id) }}" onsubmit="return confirm('Удалить задачу и все подзадачи?');">
+            <button class="btn btn--danger" type="submit">Удалить</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="graph__connector">
+      {% if task.subtasks %}
+        <span class="graph__arrow">⋯ ↓</span>
+      {% else %}
+        <span class="graph__arrow graph__arrow--muted">нет подзадач</span>
+      {% endif %}
+    </div>
+
+    <div class="graph__subnodes">
+      {% for st in task.subtasks %}
+        <div class="graph__node graph__node--sub{% if st.is_done %} graph__node--done{% endif %}">
+          <div class="graph__title">{{ st.title }}</div>
+          {% if st.description %}
+            <div class="graph__desc prewrap">{{ st.description }}</div>
+          {% endif %}
+          <div class="graph__meta muted small">
+            Статус:
+            {% if st.status == 'planned' %}Запланировано{% elif st.status == 'in_progress' %}В работе{% elif st.status == 'done' %}Сделано{% elif st.status == 'blocked' %}Заблокировано{% else %}—{% endif %}
+            · Приоритет:
+            {% if st.quadrant == 1 %}Q1{% elif st.quadrant == 2 %}Q2{% elif st.quadrant == 3 %}Q3{% elif st.quadrant == 4 %}Q4{% else %}?{% endif %}
+            {% if st.due_date %}
+              · Срок: {{ st.due_date.isoformat() }}
+            {% endif %}
+            · #{{ st.id }} · {{ st.created_at.strftime("%Y-%m-%d %H:%M") }}
+          </div>
+          <div class="graph__connector-line"></div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Подзадачи (список)</h2>
+    {% if task.subtasks|length == 0 %}
+      <div class="empty">Пока нет подзадач.</div>
+    {% else %}
+      <div class="list">
+        {% for st in task.subtasks %}
+          <div class="list__item">
+            <form method="post" action="{{ url_for('subtask_toggle', subtask_id=st.id) }}">
+              <button class="chk" type="submit" aria-label="Переключить выполнено">
+                {% if st.is_done %}✓{% else %}&nbsp;{% endif %}
+              </button>
+            </form>
+
+            <div class="list__main">
+              <div class="{% if st.is_done %}done{% endif %}">{{ st.title }}</div>
+              {% if st.description %}
+                <div class="muted small prewrap">{{ st.description }}</div>
+              {% endif %}
+              <div class="muted small">
+                Статус:
+                {% if st.status == 'planned' %}Запланировано{% elif st.status == 'in_progress' %}В работе{% elif st.status == 'done' %}Сделано{% elif st.status == 'blocked' %}Заблокировано{% else %}—{% endif %}
+                {% if st.due_date %}
+                  · Срок: {{ st.due_date.isoformat() }}
+                {% endif %}
+                · #{{ st.id }} · {{ st.created_at.strftime("%Y-%m-%d %H:%M") }}
+              </div>
+            </div>
+
+            <div class="row">
+              <a class="btn btn--ghost" href="{{ url_for('subtask_edit', subtask_id=st.id) }}">Правка</a>
+              <form method="post" action="{{ url_for('subtask_delete', subtask_id=st.id) }}" onsubmit="return confirm('Удалить подзадачу?');">
+                <button class="btn btn--ghost" type="submit">Удалить</button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </section>
+
+  <div id="subtask-modal" class="modal hidden">
+    <div class="modal__backdrop" onclick="closeSubtaskModal()"></div>
+    <div class="modal__dialog">
+      <div class="modal__header">
+        <h2>Новая подзадача</h2>
+      </div>
+      <form class="form" method="post" action="{{ url_for('subtask_create', task_id=task.id) }}">
+        <label class="field">
+          <div class="field__label">Название подзадачи</div>
+          <input name="title" placeholder="Новая подзадача…" maxlength="200" required />
+        </label>
+        <label class="field">
+          <div class="field__label">Комментарий (опционально)</div>
+          <textarea name="description" rows="3" placeholder="Детали, чек-лист, заметки…"></textarea>
+        </label>
+        <div class="row">
+          <button class="btn btn--primary" type="submit">Добавить</button>
+          <button class="btn btn--ghost" type="button" onclick="closeSubtaskModal()">Отмена</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

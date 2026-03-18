@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Таски{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container topbar__inner">
+        <a class="brand" href="{{ url_for('index') }}">Мини‑таск‑менеджер</a>
+        <nav class="nav">
+          <a class="btn" href="{{ url_for('task_new') }}">+ Новая задача</a>
+          <button class="btn btn--ghost" type="button" onclick="openImportModal()">Импорт JSON</button>
+        </nav>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="sidebar__head">
+          <div class="sidebar__title">Задачи</div>
+        </div>
+        <div class="sidebar__list">
+          {% if sidebar_tasks %}
+            {% for t in sidebar_tasks %}
+              <div class="sidebar__group">
+                <a class="sidebar__task{% if task and task.id == t.id %} sidebar__task--active{% endif %}"
+                   href="{{ url_for('task_view', task_id=t.id) }}">
+                  <span class="sidebar__task-title">
+                    {% if t.quadrant %}
+                      <span class="sidebar__pill sidebar__pill-q{{ t.quadrant }}">
+                        {% if t.quadrant == 1 %}Q1{% elif t.quadrant == 2 %}Q2{% elif t.quadrant == 3 %}Q3{% elif t.quadrant == 4 %}Q4{% endif %}
+                      </span>
+                    {% endif %}
+                    {{ t.title }}
+                  </span>
+                  {% if t.subtasks|length %}
+                    <span class="sidebar__badge">{{ t.subtasks|length }}</span>
+                  {% endif %}
+                </a>
+                {% if t.subtasks %}
+                  <ul class="sidebar__subtasks">
+                    {% for st in t.subtasks %}
+                      <li class="sidebar__subtask{% if st.is_done %} sidebar__subtask--done{% endif %}">
+                        {{ st.title }}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="sidebar__empty">Нет задач</div>
+          {% endif %}
+        </div>
+      </aside>
+
+      <main class="main">
+        <div class="container container--main">
+          {% if error %}
+            <div class="alert">{{ error }}</div>
+          {% endif %}
+          {% block content %}{% endblock %}
+
+          {% block import_block %}
+          {% endblock %}
+        </div>
+      </main>
+    </div>
+    <script>
+      function openSubtaskModal() {
+        var m = document.getElementById('subtask-modal');
+        if (m) { m.classList.remove('hidden'); }
+      }
+      function closeSubtaskModal() {
+        var m = document.getElementById('subtask-modal');
+        if (m) { m.classList.add('hidden'); }
+      }
+      function openImportModal() {
+        var m = document.getElementById('import-modal');
+        if (m) { m.classList.remove('hidden'); }
+      }
+      function closeImportModal() {
+        var m = document.getElementById('import-modal');
+        if (m) { m.classList.add('hidden'); }
+      }
+    </script>
+  </body>
+</html>

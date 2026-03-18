@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Редактировать подзадачу{% endblock %}
+
+{% block content %}
+  <div class="pagehead">
+    <h1>Редактировать подзадачу</h1>
+  </div>
+
+  <form class="form" method="post" action="{{ url_for('subtask_update', subtask_id=subtask.id) }}">
+    <label class="field">
+      <div class="field__label">Название</div>
+      <input name="title" value="{{ subtask.title }}" maxlength="200" required />
+    </label>
+
+    <label class="field">
+      <div class="field__label">Комментарий (опционально)</div>
+      <textarea name="description" rows="4">{{ subtask.description }}</textarea>
+    </label>
+
+    <label class="field">
+      <div class="field__label">Статус</div>
+      {% set st = subtask.status %}
+      <select name="status">
+        <option value="planned" {% if st == 'planned' %}selected{% endif %}>Запланировано</option>
+        <option value="in_progress" {% if st == 'in_progress' %}selected{% endif %}>В работе</option>
+        <option value="done" {% if st == 'done' %}selected{% endif %}>Сделано</option>
+        <option value="blocked" {% if st == 'blocked' %}selected{% endif %}>Заблокировано</option>
+      </select>
+    </label>
+
+    <label class="field">
+      <div class="field__label">Приоритет подзадачи</div>
+      {% set q = subtask.quadrant %}
+      <select name="quadrant">
+        <option value="1" {% if q == 1 %}selected{% endif %}>Q1 — Срочно и важно</option>
+        <option value="2" {% if q == 2 %}selected{% endif %}>Q2 — Не срочно, но важно</option>
+        <option value="3" {% if q == 3 %}selected{% endif %}>Q3 — Срочно, но не важно</option>
+        <option value="4" {% if q == 4 %}selected{% endif %}>Q4 — Не срочно и не важно</option>
+      </select>
+    </label>
+
+    <label class="field">
+      <div class="field__label">Срок подзадачи (опционально)</div>
+      <input type="date" name="due_date" value="{% if subtask.due_date %}{{ subtask.due_date.isoformat() }}{% endif %}" />
+    </label>
+
+    <label class="field field--check">
+      <input type="checkbox" name="is_done" {% if subtask.is_done %}checked{% endif %} />
+      <span>Выполнено</span>
+    </label>
+
+    <div class="row">
+      <button class="btn btn--primary" type="submit">Сохранить</button>
+      <a class="btn btn--ghost" href="{{ url_for('task_view', task_id=subtask.task_id) }}">Отмена</a>
+    </div>
+  </form>
+{% endblock %}

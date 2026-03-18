@@ -1,3 +1,5 @@
+https://github.com/StormUltimate/HAW-Helper-at-Work-/blob/main/Screen1.png
+
 # Мини‑таск‑менеджер (Flask + SQLite)
 
 Простой персональный таск‑менеджер:

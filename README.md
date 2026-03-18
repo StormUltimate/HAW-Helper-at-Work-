@@ -80,12 +80,12 @@ py .\app.py
 [
   {
     "title": "Подготовить грядки",
-    "description": "Парник + грядки под зелень",
+    "description": "Дом, закупка метериала",
     "quadrant": 2,
     "status": "planned",
     "subtasks": [
       {
-        "title": "Купить дуги и плёнку",
+        "title": "КУпить масло для авто",
         "quadrant": 1,
         "status": "in_progress"
       }

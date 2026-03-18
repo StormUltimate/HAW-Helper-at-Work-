@@ -79,8 +79,8 @@ py .\app.py
 ```json
 [
   {
-    "title": "Подготовить грядки",
-    "description": "Дом, закупка метериала",
+    "title": "Стройка дома",
+    "description": "Кирпич, закупка метериала",
     "quadrant": 2,
     "status": "planned",
     "subtasks": [

@@ -1,10 +1,13 @@
+# Мини‑таск‑менеджер (Flask + SQLite)
+
 <p align="center">
-  <img src="app/Screen1.png" alt="HAW-Helper-at-Work logo" width="220">
+  <img
+    src="https://raw.githubusercontent.com/StormUltimate/HAW-Helper-at-Work-/main/Screen1.png"
+    alt="Вид меню"
+    width="700"
+  >
 </p>
 
-https://github.com/StormUltimate/HAW-Helper-at-Work-/blob/main/Screen1.png
-
-# Мини‑таск‑менеджер (Flask + SQLite)
 
 Простой персональный таск‑менеджер:
 - задачи: создание / просмотр / редактирование / удаление

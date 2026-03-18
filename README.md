@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="app/Screen1.png" alt="UtilBase logo" width="220">
+  <img src="app/Screen1.png" alt="HAW-Helper-at-Work logo" width="220">
 </p>
 
 https://github.com/StormUltimate/HAW-Helper-at-Work-/blob/main/Screen1.png
